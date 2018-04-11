@@ -38,9 +38,15 @@ def parse_obj_json(obj, output):
             if not "children" in output:
                 output["children"] = []
 
+            url = obj.get("github_url", "")
+            if len(url) > 0:
+                url = "http:" + url
+            else:
+                url = "None"
+
             output["children"].append({
                 "title": obj.get("title"),
-                "github_url": obj.get("github_url")
+                "github_url": url
                 })
             output["children"] = sorted(output["children"], key=lambda x: x["title"])
     return output
@@ -52,7 +58,12 @@ def csvify(obj):
             [csvify(ch) for ch in obj["children"]]
             stack.pop()
         elif type(obj["children"]) is list and len(obj["children"]) == 0:
-            print(",".join(stack[:] + [obj.get("title")]))
+            url = obj.get("github_url", "")
+            if len(url) > 0:
+                url = "http:" + url
+            else:
+                url = "None"
+            print(",".join(stack[:] + [obj.get("title"), url]))
 
 
 if options.should_csv:
