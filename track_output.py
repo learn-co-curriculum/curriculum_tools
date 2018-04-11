@@ -21,8 +21,8 @@ if len(args) < 1:
 # Query JSON endpoint
 url = "https://learn.co/api/v1/tracks/" + args[0]
 
+# Fetch data and parse the JSON
 content = urllib.request.urlopen(url).read()
-# content = open("test.json").read()
 struc = json.loads(content)
 
 # For accumulating paths
@@ -38,11 +38,9 @@ def parse_obj_json(obj, output):
             if not "children" in output:
                 output["children"] = []
 
+            # Deal with null HTTP
             url = obj.get("github_url", "")
-            if len(url) > 0:
-                url = "http:" + url
-            else:
-                url = "None"
+            url = "http:" + url if len(url) > 0 else "None"
 
             output["children"].append({
                 "title": obj.get("title"),
@@ -59,10 +57,7 @@ def csvify(obj):
             stack.pop()
         elif type(obj["children"]) is list and len(obj["children"]) == 0:
             url = obj.get("github_url", "")
-            if len(url) > 0:
-                url = "http:" + url
-            else:
-                url = "None"
+            url = "http:" + url if len(url) > 0 else "None"
             print(",".join(stack[:] + [obj.get("title"), url]))
 
 
