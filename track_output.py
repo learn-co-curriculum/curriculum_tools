@@ -45,8 +45,18 @@ def parse_obj_json(obj, output):
             output["children"] = sorted(output["children"], key=lambda x: x["title"])
     return output
 
+def csvify(obj):
+    if "children" in obj:
+        if type(obj["children"]) is list and len(obj["children"]) > 0:
+            stack.append(obj.get("title"))
+            [csvify(ch) for ch in obj["children"]]
+            stack.pop()
+        elif type(obj["children"]) is list and len(obj["children"]) == 0:
+            print(",".join(stack[:] + [obj.get("title")]))
+
+
 if options.should_csv:
-    pass
+    csvify(struc)
 else:
     print(json.dumps(parse_obj_json(struc, {}), sort_keys=True, indent=4))
 
