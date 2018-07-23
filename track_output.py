@@ -52,14 +52,16 @@ def parse_obj_json(obj, output):
 def csvify(obj):
     if "children" in obj:
         if type(obj["children"]) is list and len(obj["children"]) > 0:
-            stack.append(obj.get("title"))
+            stack.append(quote_wrap(obj.get("title")))
             [csvify(ch) for ch in obj["children"]]
             stack.pop()
         elif type(obj["children"]) is list and len(obj["children"]) == 0:
             url = obj.get("github_url", "")
-            url = "http:" + url if len(url) > 0 else "None"
-            print(",".join(stack[:] + [obj.get("title"), url]))
+            url = quote_wrap("http:" + url) if len(url) > 0 else "None"
+            print(",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
 
+def quote_wrap(s):
+    return '"' + s + '"'
 
 if options.should_csv:
     csvify(struc)
