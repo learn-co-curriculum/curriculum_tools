@@ -116,7 +116,7 @@ summary = <<EOF
 
 We recommend you upgrade. While completion is important, capability in job
 interviews is far more important. Even if you're close to finishing V5's
-React and Redux material, investing the time to get to get curent standard
+React and Redux material, investing the time to get to get current standard
 will make you a better interview candidate.
 
 V5 has #{sTrack.lesson_count} lessons.
