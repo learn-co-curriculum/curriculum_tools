@@ -147,4 +147,14 @@ You will be required to complete:
 EOF
 
 
-print summary
+summary
+  .split(/\n$/)
+  .each do |e|
+    temp = e.chomp
+    print("\n\n") if temp =~ /^\s*$/
+
+    tokens = temp.split(/\n/)
+    tokens.shift if tokens[0].empty?
+
+    tokens.each {|t| print("#{t} "); print("\n") if t =~ /\t */}
+end
