@@ -60,7 +60,7 @@ def csvify(obj):
         elif type(obj["children"]) is list and len(obj["children"]) == 0:
             url = obj.get("github_url", "")
             url = quote_wrap(url) if len(url) > 0 else "None"
-            print(",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
+            print(",".join(stack[:] + [quote_wrap(json.dumps(obj.get("title"))), url]))
 
 def bulletify(obj, indent=0):
     if "children" in obj:
