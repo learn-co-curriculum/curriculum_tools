@@ -57,7 +57,7 @@ def csvify(obj):
             stack.pop()
         elif type(obj["children"]) is list and len(obj["children"]) == 0:
             url = obj.get("github_url", "")
-            url = quote_wrap("http:" + url) if len(url) > 0 else "None"
+            url = quote_wrap(url) if len(url) > 0 else "None"
             print(",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
 
 def quote_wrap(s):
