@@ -11,6 +11,7 @@ import pdb
 # See whether CSV or JSON
 parser = OptionParser()
 parser.add_option("-c", "--csv", dest="should_csv", action="store_true")
+parser.add_option("-b", "--bullet", dest="should_bullet", action="store_true")
 (options, args) = parser.parse_args()
 
 # Ensure track ID
@@ -60,11 +61,23 @@ def csvify(obj):
             url = quote_wrap(url) if len(url) > 0 else "None"
             print(",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
 
+def bulletify(obj, indent=0):
+    if "children" in obj:
+        if type(obj["children"]) is list and len(obj["children"]) > 0:
+            print((indent * ' ') + '+ ' + quote_wrap(obj.get("title")))
+            [bulletify(ch, indent + 2) for ch in obj["children"]]
+        elif type(obj["children"]) is list and len(obj["children"]) == 0:
+            url = obj.get("github_url", "")
+            url = quote_wrap(url) if len(url) > 0 else "None"
+            print((indent * ' ') + '- ' + ",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
+
 def quote_wrap(s):
     return '"' + s + '"'
 
 if options.should_csv:
     csvify(struc)
+if options.should_bullet:
+    bulletify(struc)
 else:
     print(json.dumps(parse_obj_json(struc, {}), sort_keys=True, indent=4))
 
