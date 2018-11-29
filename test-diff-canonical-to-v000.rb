@@ -42,24 +42,30 @@ class Comparer
       web_class_reponame = canonical_reponame.sub('curriculum', 'students') + '-v-000'
 
       begin
-      sha1, sha2 = [last_sha_for_repo(canonical_reponame), last_sha_for_repo(web_class_reponame)]
+      rinfo_canonical,
+        rinfo_student = [sha_mtime_for_repo(canonical_reponame), sha_mtime_for_repo(web_class_reponame)]
       rescue Octokit::NotFound => e
         puts "[NOT FOUND] #{url}: #{e.message}"
       end
 
-      puts sha1 == sha2 ? "[OK] #{url}" :  "[ERROR] #{url}"
+      commit_status = "#{rinfo_canonical.last} => #{rinfo_student.last}"
+      status = rinfo_canonical.first == rinfo_student.first ?
+        "[OK (#{commit_status})] #{url}" :
+        "[ERROR (#{commit_status})] #{url}"
+      puts status
     end
   end
 
-  def last_sha_for_repo(repo)
+  def sha_mtime_for_repo(repo)
     all_commits = @client.commits(repo)
     commit_obj = all_commits.first.to_h
-    sha_url = commit_obj[:commit][:url]
-    sha_url.split('/').last
+    commit_info = commit_obj[:commit][:committer]
+    commit_info_string = [commit_info[:name], commit_info[:date]].join('@')
+    [commit_obj[:sha], commit_info_string]
   end
 
   def urls
-    @io.split("\n")
+    @io.split("\n")[0..0]
   end
 end
 
