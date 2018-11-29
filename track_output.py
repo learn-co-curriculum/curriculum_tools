@@ -12,6 +12,7 @@ import pdb
 parser = OptionParser()
 parser.add_option("-c", "--csv", dest="should_csv", action="store_true")
 parser.add_option("-b", "--bullet", dest="should_bullet", action="store_true")
+parser.add_option("-u", "--urls-only", dest="should_urlsonly", action="store_true")
 (options, args) = parser.parse_args()
 
 # Ensure track ID
@@ -71,13 +72,23 @@ def bulletify(obj, indent=0):
             url = quote_wrap(url) if len(url) > 0 else "None"
             print((indent * ' ') + '- ' + ",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
 
+def only_urls(obj, indent=0):
+    if "children" in obj:
+        if type(obj["children"]) is list and len(obj["children"]) > 0:
+            [only_urls(ch, indent + 2) for ch in obj["children"]]
+        elif type(obj["children"]) is list and len(obj["children"]) == 0:
+            url = obj.get("github_url", "")
+            print(url)
+
 def quote_wrap(s):
     return '"' + s + '"'
 
 if options.should_csv:
     csvify(struc)
-if options.should_bullet:
+elif options.should_bullet:
     bulletify(struc)
+elif options.should_urlsonly:
+    only_urls(struc)
 else:
     print(json.dumps(parse_obj_json(struc, {}), sort_keys=True, indent=4))
 
