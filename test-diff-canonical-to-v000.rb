@@ -62,6 +62,7 @@ class Comparer
         "[ERROR (#{commit_status})] #{url}"
       end
       puts status
+      STDOUT.flush
     end
     puts "SUMMARY: #{total} repos: #{error_count} ERROR (#{(Float(error_count) / total * 100).round}%); #{ok_count} OK (#{(Float(ok_count) / total * 100).round}%)"
   end
