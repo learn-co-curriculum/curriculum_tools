@@ -74,7 +74,7 @@ class Comparer
   end
 
   def urls
-    @io.split("\n")[0..0]
+    @io.split("\n")
   end
 end
 
