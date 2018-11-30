@@ -50,6 +50,7 @@ class Comparer
         rinfo_student = [sha_mtime_for_repo(canonical_reponame), sha_mtime_for_repo(web_class_reponame)]
       rescue Octokit::NotFound => e
         puts "[NOT FOUND] #{url}: #{e.message}"
+        next
       end
 
       commit_status = "#{rinfo_canonical.last} => #{rinfo_student.last}"
