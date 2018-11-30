@@ -37,6 +37,10 @@ class Comparer
   end
 
   def report
+    total = urls.count
+    ok_count = 0
+    error_count = 0
+
     urls.each do |url|
       canonical_reponame = url.sub(/.*github.com\//,'')
       web_class_reponame = canonical_reponame.sub('curriculum', 'students') + '-v-000'
@@ -49,11 +53,16 @@ class Comparer
       end
 
       commit_status = "#{rinfo_canonical.last} => #{rinfo_student.last}"
-      status = rinfo_canonical.first == rinfo_student.first ?
-        "[OK (#{commit_status})] #{url}" :
+      status = if rinfo_canonical.first == rinfo_student.first
+        ok_count += 1
+        "[OK (#{commit_status})] #{url}"
+      else
+        error_count += 1
         "[ERROR (#{commit_status})] #{url}"
+      end
       puts status
     end
+    puts "SUMMARY: #{total} repos: #{error_count} ERROR (#{(Float(error_count) / total * 100).round}%); #{ok_count} OK (#{(Float(ok_count) / total * 100).round}%)"
   end
 
   def sha_mtime_for_repo(repo)
