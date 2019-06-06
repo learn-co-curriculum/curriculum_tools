@@ -1,8 +1,7 @@
 # `github/hub` fork at `sgharms/hub:fis`
 
 1. Clone https://github.com/sgharms/hub/
-2. Checkout `fis` branch
-3. Run `make`
+2. Checkout `fis` branch 3. Run `make`
 4. This creates `bin/hub` in the git dir
 5. Use _this_ `hub` (adjust PATH, use `/path/to/cloned/hub/bin/hub`)
 
@@ -17,3 +16,9 @@ The `-f` flag takes a format string for awesome output
 **Simple List of Issue URLs**
 
 `-f %U%n'`
+
+## Data Sources
+
+Look in `lesson_lists/`. The "Rewritten & Brickified" tracks we have created
+since July 2018 are here. Using them as input should give you a good sense of
+the issues.
