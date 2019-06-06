@@ -16,4 +16,4 @@ The `-f flag takes a format string for awesome output
 
 **Simple List of Issue URLs**
 
-`-f %U%n'
+`-f %U%n'`
