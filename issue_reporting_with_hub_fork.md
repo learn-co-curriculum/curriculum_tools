@@ -8,7 +8,7 @@
 
 The critical change is support for an `-r` flag which allows you to specify a repo to get the issues on *OR*, if you pass `-r STDIN` you can read in a file of repos to query. And that's very handy.
 
-The `-f flag takes a format string for awesome output
+The `-f` flag takes a format string for awesome output
 
 **JSON** (wih some massaging)
 
