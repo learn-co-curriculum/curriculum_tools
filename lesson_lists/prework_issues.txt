@@ -1,0 +1,5 @@
+https://github.com/learn-co-curriculum/programming-univbasics-expressions-quiz/issues/1
+https://github.com/learn-co-curriculum/programming-univbasics-4-nested-hashes-readme/issues/2
+https://github.com/learn-co-curriculum/programming-univbasics-4-nested-hashes-lab/issues/1
+https://github.com/learn-co-curriculum/advanced-hashes-hashketball/issues/48
+https://github.com/learn-co-curriculum/advanced-hashes-hashketball/issues/41
