@@ -52,6 +52,20 @@ function check-track-git-status() {
 
 function get-last-commit-sha() {
   local reponame=$1
-  echo $reponame
-  curl "https://api.github.com/repos/${reponame}/commits" | jq '.[0].sha'
+  curl -s "https://api.github.com/repos/${reponame}/commits"  | jq ".[0].sha"
+}
+
+function check-for-misalignment() {
+  local default_org="learn-co-curriculum"
+  local students_org="learn-co-students"
+  local repo_shortname="$1"
+  local downstream_org="$2"
+  local canonical_sha=$(get-last-commit-sha "${default_org}/${repo_shortname}")
+  local downstream_sha=$(get-last-commit-sha "${students_org}/${repo_shortname}-${downstream_org}")
+  if [ $canonical_sha != $downstream_sha ]
+  then
+    echo "${repo_shortname} is out of sync! ${canonical_sha} versus ${downstream_sha}"
+  else
+    echo "${repo_shortname} is synchronized at ${canonical_sha}"
+  fi
 }
