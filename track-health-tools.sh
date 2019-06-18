@@ -49,3 +49,9 @@ function check-track-git-status() {
   done
   cd "$pwd";
 }
+
+function get-last-commit-sha() {
+  local reponame=$1
+  echo $reponame
+  curl "https://api.github.com/repos/${reponame}/commits" | jq '.[0].sha'
+}
