@@ -52,7 +52,7 @@ function check-track-git-status() {
 
 function get-last-commit-sha() {
   local reponame=$1
-  curl -s "https://api.github.com/repos/${reponame}/commits"  | jq ".[0].sha"
+  curl -H "Authorization: token $(hub-gh-token)" -s "https://api.github.com/repos/${reponame}/commits"  | jq ".[0].sha" 2>&1
 }
 
 function check-for-misalignment() {
