@@ -23,10 +23,6 @@ if len(args) < 1:
 # Query JSON endpoint
 url = "https://learn.co/api/v1/tracks/" + args[0]
 
-# Fetch data and parse the JSON
-content = urllib.request.urlopen(url).read()
-struc = json.loads(content)
-
 # For accumulating paths
 stack = []
 
@@ -83,12 +79,21 @@ def only_urls(obj, indent=0):
 def quote_wrap(s):
     return '"' + s + '"'
 
-if options.should_csv:
-    csvify(struc)
-elif options.should_bullet:
-    bulletify(struc)
-elif options.should_urlsonly:
-    only_urls(struc)
-else:
-    print(json.dumps(parse_obj_json(struc, {}), sort_keys=True, indent=4))
+# Fetch data and parse the JSON
+try:
+    content = urllib.request.urlopen(url).read()
+    struc = json.loads(content)
+    if options.should_csv:
+        csvify(struc)
+    elif options.should_bullet:
+        bulletify(struc)
+    elif options.should_urlsonly:
+        only_urls(struc)
+    else:
+        print(json.dumps(parse_obj_json(struc, {}), sort_keys=True, indent=4))
+except urllib.error.HTTPError as err:
+    print("Unable to connect to {0} [{1}]".format(url, str(err)))
+    sys.exit(1)
+
+
 
