@@ -69,3 +69,22 @@ function check-for-misalignment() {
     echo "${repo_shortname} is synchronized at ${canonical_sha}"
   fi
 }
+
+function check-for-misalignment-lcc() {
+  local default_org="learn-co-curriculum"
+  local students_org="learn-co-curriculum"
+  local repo_shortname="$1"
+
+  local canonical_sha=$(get-last-commit-sha "${default_org}/${repo_shortname}")
+  local downstream_sha=$(get-last-commit-sha "${students_org}/phrg-${repo_shortname}")
+
+  if [ "$(echo $canonical_sha|cut -c1-9)" == 'jq: error' ] || [ "$(echo $downstream_sha|cut -c1-9)" == 'jq: error' ]
+  then
+    echo "[UNIQSHA] ${repo_shortname} was not replicated"
+  elif [ $canonical_sha != $downstream_sha ]
+  then
+    echo "[UNSYNC] phrg-${repo_shortname} [${canonical_sha}:${downstream_sha}]"
+  else
+    echo "[SYNC] ${repo_shortname}"
+  fi
+}
