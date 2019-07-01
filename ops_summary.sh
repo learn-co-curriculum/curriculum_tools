@@ -19,7 +19,7 @@ process_sourcefile () {
 for source_file in $SOURCE_FILES
 do
   SRC="${SEARCH_DIR}/${source_file}"
-  DEST="${SRC%_repos.txt}_issues.txt"
+  DEST="${SRC%_repos.txt}_issues.md"
 
   if [ -f "${SRC}" ]
   then
@@ -29,5 +29,3 @@ do
     echo "Could not find ${SEARCH_DIR}/${source_file} | $SRC"
   fi
 done
-
-
