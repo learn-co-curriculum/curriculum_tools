@@ -10,9 +10,9 @@ import pdb
 
 # See whether CSV or JSON
 parser = OptionParser()
-parser.add_option("-c", "--csv", dest="should_csv", action="store_true")
-parser.add_option("-b", "--bullet", dest="should_bullet", action="store_true")
-parser.add_option("-u", "--urls-only", dest="should_urlsonly", action="store_true")
+parser.add_option("-c", "--csv", dest="should_csv", action="store_true", help="Export track as CSV file")
+parser.add_option("-b", "--bullet", dest="should_bullet", action="store_true", help="Export track as Markdown-friendly bullet list with indentation")
+parser.add_option("-u", "--urls", dest="should_urlsonly", action="store_true", help="Export the track as a list of HTTP URLs")
 (options, args) = parser.parse_args()
 
 # Ensure track ID
