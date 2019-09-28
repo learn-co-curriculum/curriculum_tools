@@ -6,6 +6,7 @@ import urllib.request
 import json
 import pprint
 import re
+import yaml
 
 import pdb
 
@@ -13,8 +14,9 @@ import pdb
 parser = OptionParser()
 parser.add_option("-c", "--csv", dest="should_csv", action="store_true", help="Export track as CSV file")
 parser.add_option("-b", "--bullet", dest="should_bullet", action="store_true", help="Export track as Markdown-friendly bullet list with indentation")
-parser.add_option("-u", "--urls", dest="should_urlsonly", action="store_true", help="Export the track as a list of HTTP URLs")
+parser.add_option("-u", "--urls-only", dest="should_urlsonly", action="store_true")
 parser.add_option("-g", "--github-urls", dest="should_gh_urlsonly", action="store_true", help="Export the track as a list of Git URLs")
+parser.add_option("-y", "--yaml", dest="should_yaml", action="store_true")
 (options, args) = parser.parse_args()
 
 # Ensure track ID
@@ -93,6 +95,21 @@ def frobnicate_repo_url_to_git_url(inp):
 def quote_wrap(s):
     return '"' + s + '"'
 
+def recursively_drop_keys(struc={}, key=""):
+    struc.pop(key, None)
+    if 'children' in struc:
+        if len(struc['children']) == 0:
+            struc.pop('children', None)
+        else:
+            [ recursively_drop_keys(subtree, key) for subtree in struc['children'] ]
+
+def yamlify(track_dict):
+    unwanted_keys = ['published_batch_ids', 'id', 'created_at', 'track_id',
+    'depth']
+    for key in unwanted_keys:
+        recursively_drop_keys(track_dict, key)
+    print(yaml.dump(track_dict, sort_keys=False))
+
 # Fetch data and parse the JSON
 try:
     content = urllib.request.urlopen(url).read()
@@ -105,6 +122,8 @@ try:
         only_urls(struc)
     elif options.should_gh_urlsonly:
         only_ghurls(struc)
+    elif options.should_yaml:
+        yamlify(struc)
     else:
         print(json.dumps(parse_obj_json(struc, {}), sort_keys=True, indent=4))
 except urllib.error.HTTPError as err:
