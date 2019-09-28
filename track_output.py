@@ -30,67 +30,53 @@ url = "https://learn.co/api/v1/tracks/" + args[0]
 # For accumulating paths
 stack = []
 
-def parse_obj_json(obj, output):
-    if "children" in obj:
-        if type(obj["children"]) is list and len(obj["children"]) > 0:
-            output_key = obj.get("title")
-            output[output_key] = {}
-            [parse_obj_json(ch, output[output_key]) for ch in obj["children"]]
-        elif type(obj["children"]) is list and len(obj["children"]) == 0:
-            if not "children" in output:
-                output["children"] = []
-
-            # Deal with null HTTP
-            url = obj.get("github_url", "")
-            url = "http:" + url if len(url) > 0 else "None"
-
-            output["children"].append({
-                "title": obj.get("title"),
-                "github_url": url
-                })
-            output["children"] = sorted(output["children"], key=lambda x: x["title"])
+def filtered_json_object(obj, output):
+    if obj.get("children", False):
+        output_key = obj.get("title")
+        output[output_key] = { }
+        [filtered_json_object(ch, output[output_key]) for ch in obj["children"]]
+    else:
+        # Deal with null HTTP
+        url = obj.get("github_url", "")
+        url = "http:" + url if len(url) > 0 else "None"
+        if not 'children' in output:
+            output['children'] = []
+        output["children"].append(obj)
     return output
 
 def csvify(obj):
-    if "children" in obj:
-        if type(obj["children"]) is list and len(obj["children"]) > 0:
-            stack.append(quote_wrap(obj.get("title")))
-            [csvify(ch) for ch in obj["children"]]
-            stack.pop()
-        elif type(obj["children"]) is list and len(obj["children"]) == 0:
-            url = obj.get("github_url", "")
-            url = quote_wrap(url) if len(url) > 0 else "None"
-            print(",".join(stack[:] + [json.dumps(obj.get("title")), url]))
+    if obj.get("children", False):
+        stack.append(quote_wrap(obj.get("title")))
+        [csvify(ch) for ch in obj["children"]]
+        stack.pop()
+    else:
+        url = obj.get("github_url", "")
+        url = quote_wrap(url) if len(url) > 0 else "None"
+        print(",".join(stack[:] + [json.dumps(obj.get("title")), url]))
 
 def bulletify(obj, indent=0):
-    if "children" in obj:
-        if type(obj["children"]) is list and len(obj["children"]) > 0:
-            print((indent * ' ') + '+ ' + quote_wrap(obj.get("title")))
-            [bulletify(ch, indent + 2) for ch in obj["children"]]
-        elif type(obj["children"]) is list and len(obj["children"]) == 0:
-            url = obj.get("github_url", "")
-            url = quote_wrap(url) if len(url) > 0 else "None"
-            print((indent * ' ') + '- ' + ",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
+    if obj.get("children", False):
+        print((indent * ' ') + '+ ' + quote_wrap(obj.get("title")))
+        [bulletify(ch, indent + 2) for ch in obj["children"]]
+    else:
+        url = obj.get("github_url", "")
+        url = quote_wrap(url) if len(url) > 0 else "None"
+        print((indent * ' ') + '- ' + ",".join(stack[:] + [quote_wrap(obj.get("title")), url]))
 
-def only_urls(obj, indent=0):
-    if "children" in obj:
-        if type(obj["children"]) is list and len(obj["children"]) > 0:
-            [only_urls(ch, indent + 2) for ch in obj["children"]]
-        elif type(obj["children"]) is list and len(obj["children"]) == 0:
-            url = obj.get("github_url", "")
-            print(url)
+def only_urls(obj, indent=0, formatter = lambda x: x ):
+    if obj.get("children", False):
+        [only_urls(ch, indent + 2, formatter) for ch in obj["children"]]
+    else:
+        url = obj.get("github_url", "")
+        print(formatter(url))
 
 def only_ghurls(obj, indent=0):
-    if "children" in obj:
-        if type(obj["children"]) is list and len(obj["children"]) > 0:
-            [only_ghurls(ch, indent + 2) for ch in obj["children"]]
-        elif type(obj["children"]) is list and len(obj["children"]) == 0:
-            url = obj.get("github_url", "")
-            print(frobnicate_repo_url_to_git_url(url))
+    only_urls(obj, 0, html_url_to_git_url)
 
-def frobnicate_repo_url_to_git_url(inp):
-    org_and_repo = re.sub(r'https?://github.com/', '', inp)
-    return 'git@github.com:' + org_and_repo + '.git'
+def html_url_to_git_url(s):
+    return "".join(['git@github.com:',
+        re.sub(r'https?://github.com/', '', s),
+        '.git'])
 
 def quote_wrap(s):
     return '"' + s + '"'
@@ -98,22 +84,28 @@ def quote_wrap(s):
 def recursively_drop_key(struc={}, key=""):
     struc.pop(key, None)
     if 'children' in struc:
+        [ recursively_drop_key(subtree, key) for subtree in struc['children'] ]
+
+def recursively_drop_empty_children_key(struc={}):
+    if 'children' in struc:
         if len(struc['children']) == 0:
             struc.pop('children', None)
         else:
-            [ recursively_drop_key(subtree, key) for subtree in struc['children'] ]
+            [ recursively_drop_empty_children_key(subtree) for subtree in struc['children'] ]
 
 def yamlify(track_dict):
-    unwanted_keys = ['published_batch_ids', 'id', 'created_at', 'track_id',
-    'depth']
-    for key in unwanted_keys:
-        recursively_drop_key(track_dict, key)
     print(yaml.dump(track_dict, sort_keys=False))
 
 # Fetch data and parse the JSON
 try:
     content = urllib.request.urlopen(url).read()
     struc = json.loads(content)
+
+    recursively_drop_empty_children_key(struc)
+    unwanted_keys = ['published_batch_ids', 'id', 'created_at', 'track_id', 'depth']
+    for key in unwanted_keys:
+        recursively_drop_key(struc, key)
+
     if options.should_csv:
         csvify(struc)
     elif options.should_bullet:
@@ -125,7 +117,7 @@ try:
     elif options.should_yaml:
         yamlify(struc)
     else:
-        print(json.dumps(parse_obj_json(struc, {}), sort_keys=True, indent=4))
+        print(json.dumps(filtered_json_object(struc, {}), sort_keys=True, indent=4))
 except urllib.error.HTTPError as err:
     print("Unable to connect to {0} [{1}]".format(url, str(err)))
     sys.exit(1)
