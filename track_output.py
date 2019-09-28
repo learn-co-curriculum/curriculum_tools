@@ -95,19 +95,19 @@ def frobnicate_repo_url_to_git_url(inp):
 def quote_wrap(s):
     return '"' + s + '"'
 
-def recursively_drop_keys(struc={}, key=""):
+def recursively_drop_key(struc={}, key=""):
     struc.pop(key, None)
     if 'children' in struc:
         if len(struc['children']) == 0:
             struc.pop('children', None)
         else:
-            [ recursively_drop_keys(subtree, key) for subtree in struc['children'] ]
+            [ recursively_drop_key(subtree, key) for subtree in struc['children'] ]
 
 def yamlify(track_dict):
     unwanted_keys = ['published_batch_ids', 'id', 'created_at', 'track_id',
     'depth']
     for key in unwanted_keys:
-        recursively_drop_keys(track_dict, key)
+        recursively_drop_key(track_dict, key)
     print(yaml.dump(track_dict, sort_keys=False))
 
 # Fetch data and parse the JSON
