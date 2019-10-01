@@ -7,7 +7,7 @@ process_sourcefile () {
   cat "$1" |hub issue -r STDIN --include-pulls -f '%U%n' > "$2" 2>&1
 }
 
-SOURCE_FILES="prework_repos.txt mod1_repos.txt pfwtfp_repos.txt mod2_repos.txt mod3_1_repos.txt mod4_repos.txt v7_repos.txt"
+SOURCE_FILES="prework_repos.txt mod1_repos.txt pfwtfp_repos.txt mod2_repos.txt mod3_1_repos.txt mod4_repos.txt v7_repos.txt v8_repos.txt"
 DEST_DIR_PREFIX=$(date "+%Y-%m-%d")
 
 if [ -z "$1" ]
