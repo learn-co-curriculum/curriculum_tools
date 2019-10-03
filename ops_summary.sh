@@ -10,7 +10,7 @@ else
   SEARCH_DIR="$1"
 fi
 
-SOURCE_FILES="prework_repos.txt mod1_repos.txt pfwtfp_repos.txt mod2_repos.txt mod3_1_repos.txt mod4_repos.txt v7_repos.txt"
+SOURCE_FILES="prework_repos.txt mod1_repos.txt pfwtfp_repos.txt mod2_repos.txt mod3_1_repos.txt mod4_repos.txt v7_repos.txt v8_repos.txt"
 
 process_sourcefile () {
   cat "$1" |/home/sgharms/git_checkouts/hub-sgh/bin/hub  issue -r STDIN -f '* %U%n' > "$2" 2>&1
