@@ -13,7 +13,7 @@ fi
 SOURCE_FILES="prework_repos.txt mod1_repos.txt pfwtfp_repos.txt mod2_repos.txt mod3_1_repos.txt mod4_repos.txt v7_repos.txt v8_repos.txt"
 
 process_sourcefile () {
-  cat "$1" |/home/sgharms/git_checkouts/hub-sgh/bin/hub  issue -r STDIN -f '* %U%n' > "$2" 2>&1
+  cat "$1" |/home/sgharms/git_checkouts/hub-sgh/bin/hub  issue -r STDIN -f '* %U [%au]: %t%n' > "$2" 2>&1
 }
 
 for source_file in $SOURCE_FILES
@@ -24,7 +24,7 @@ do
   if [ -f "${SRC}" ]
   then
     process_sourcefile "${SEARCH_DIR}/${source_file}" "${DEST}"
-    echo "${source_file} $(wc -l ${DEST} |awk '{print $1}')"
+    echo "${source_file} $(grep http ${DEST} | wc -l |awk '{print $1}')"
   else
     echo "Could not find ${SEARCH_DIR}/${source_file} | $SRC"
   fi
